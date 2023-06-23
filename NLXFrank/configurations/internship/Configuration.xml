@@ -4,13 +4,22 @@
 
   <Adapter name="Frank2NLX">
     <Receiver name="Frank2NLXReceiver">
-      <ApiListener name="Test" uriPattern="test" />
+      <ApiListener name="Frank2NLX" uriPattern="frank2nlx" />
     </Receiver>
     <Pipeline>
+      <Exits>
+        <Exit name="EXIT" state="SUCCESS" />
+        <Exit name="EXCEPTION" state="ERROR" />
+      </Exits>
       <SenderPipe name="http-sender-nlx-outway-hello-world">
         <HttpSender name="nlx-frank-hello-world" methodType="GET"
           url="http://localhost:8080/01683721052184331655/frank2example/hello-world" />
+        <Forward name="exception" path="ErrorData" />
+        <Forward name="success" path="EXIT" />
       </SenderPipe>
+      <JsonPipe name="ErrorData">
+        <Forward name="success" path="EXCEPTION" />
+      </JsonPipe>
     </Pipeline>
   </Adapter>
 </Configuration>
