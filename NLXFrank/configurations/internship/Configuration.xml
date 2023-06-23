@@ -1,0 +1,16 @@
+<Configuration
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../FrankConfig.xsd">
+
+  <Adapter name="Frank2NLX">
+    <Receiver name="Frank2NLXReceiver">
+      <ApiListener name="Test" uriPattern="test" />
+    </Receiver>
+    <Pipeline>
+      <SenderPipe name="http-sender-nlx-outway-hello-world">
+        <HttpSender name="nlx-frank-hello-world" methodType="GET"
+          url="http://localhost:8080/01683721052184331655/frank2example/hello-world" />
+      </SenderPipe>
+    </Pipeline>
+  </Adapter>
+</Configuration>

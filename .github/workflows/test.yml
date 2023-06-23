@@ -1,0 +1,75 @@
+name: Test
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Checkout Frank!Runner
+        uses: actions/checkout@v2
+        with:
+          repository: ibissource/frank-runner
+          path: frank-runner
+      - name: Cache Frank!Runner dependencies - build
+        uses: actions/cache@v3
+        with:
+          path: frank-runner/build
+          key: ${{ runner.os }}-frank-runner-build
+          restore-keys: |
+            ${{ runner.os }}-frank-runner-build
+      - name: Cache Frank!Runner dependencies - download
+        uses: actions/cache@v3
+        with:
+          path: frank-runner/download
+          key: ${{ runner.os }}-frank-runner-download
+          restore-keys: |
+            ${{ runner.os }}-frank-runner-download
+      - name: Cache Maven downloads
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository/
+          key: ${{ runner.os }}-maven
+          restore-keys: |
+            ${{ runner.os }}-maven
+      - name: Configure another port
+        run: echo "tomcat.port=8091" > NLXFrank/frank-runner.properties
+      - name: Configure another SSL port
+        run: echo "tomcat.secure.port=8443" >> NLXFrank/frank-runner.properties
+      - name: Check network
+        run: time ping -c 4 -O -v -w 60 localhost
+      - name: Start Frank!Runner
+        working-directory: NLXFrank
+        run: bash ./restart.sh
+      - name: Wait until Frank!Framework is up
+        run: bash .github/workflows/waitForUrl.sh http://localhost:8091/iaf/api/server/health 500
+      - name: Wait, otherwise we fail with status STARTING
+        run: sleep 10s
+      - name: Capture status
+        id: captureStatus
+        uses: fjogeleit/http-request-action@v1
+        with:
+          method: GET
+          url: 'http://localhost:8091/iaf/api/server/health'
+      - name: Analyze status
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let rawStatus = '${{ steps.captureStatus.outputs.response }}'
+            core.info('Captured status: ' + rawStatus)
+            let status = JSON.parse(rawStatus)
+            if(! status.status) {
+              core.setFailed('Response has no field "status"')
+            } else if(status.status !== 'OK') {
+              core.setFailed('Field "status" is not "OK"')
+            } else {
+              core.info('status is OK');
+            }
+      - name: Store Apache Tomcat log
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: NLXFrank-logs
+          path: build/*/logs
+      - name: Check existence of FrankConfig.xsd - for classes
+        run: test -f NLXFrank/configurations/FrankConfig.xsd
