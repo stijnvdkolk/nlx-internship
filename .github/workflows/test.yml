@@ -25,13 +25,6 @@ jobs:
           key: ${{ runner.os }}-frank-runner-download
           restore-keys: |
             ${{ runner.os }}-frank-runner-download
-      - name: Cache Maven downloads
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository/
-          key: ${{ runner.os }}-maven
-          restore-keys: |
-            ${{ runner.os }}-maven
       - name: Configure another port
         run: echo "tomcat.port=8091" > NLXFrank/frank-runner.properties
       - name: Configure another SSL port
@@ -70,6 +63,6 @@ jobs:
         if: always()
         with:
           name: NLXFrank-logs
-          path: build/*/logs
+          path: frank-runner/build/*/logs
       - name: Check existence of FrankConfig.xsd - for classes
         run: test -f NLXFrank/configurations/FrankConfig.xsd
