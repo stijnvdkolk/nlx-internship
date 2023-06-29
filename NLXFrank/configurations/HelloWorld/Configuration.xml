@@ -10,4 +10,12 @@
       <FixedResultPipe name="HelloWorld" returnString="Hello World!" />
     </Pipeline>
   </Adapter>
+  <Adapter name="AnotherHelloWorld">
+    <Receiver name="AnotherHelloWorldReceiver">
+      <ApiListener name="AnotherHelloWorldApiListener" uriPattern="another-hello-world" />
+    </Receiver>
+    <Pipeline>
+      <FixedResultPipe name="AnotherHelloWorld" returnString="Another Hello World!" />
+    </Pipeline>
+  </Adapter>
 </Configuration>
