@@ -13,7 +13,7 @@
       </Exits>
       <SenderPipe name="http-sender-nlx-outway-hello-world">
         <HttpSender name="nlx-frank-hello-world" methodType="GET"
-          url="http://outway-nlx-outway.nlx.svc.cluster.local/01683721052184331655/franknlx/hello-world" />
+          url="http://outway-nlx-outway.nlx.svc.cluster.local/01683721052184331655/nlx2frank/hello-world" />
         <Forward name="exception" path="ErrorData" />
         <Forward name="success" path="EXIT" />
       </SenderPipe>
